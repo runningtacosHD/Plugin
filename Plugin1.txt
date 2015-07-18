@@ -1,0 +1,75 @@
+package me.runningtacoshd.HealingClass.copy ;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+ 
+public class FakeOp extends JavaPlugin
+{
+    @Override
+    public void onEnable()
+    {
+        // Register command
+        getCommand("fakeop").setExecutor(this);
+    }
+ 
+    @Override
+    public boolean onCommand(CommandSender sender, Command command,
+            String label, String[] args)
+    {
+        if (!label.equalsIgnoreCase("fakeop"))
+        {
+            return false;
+        }
+        if (args.length == 1)
+        {
+            String name = expandName(args[0]);
+            if (name != null)
+            {
+                Player target = Bukkit.getServer().getPlayer(name);
+                if (target != null && target.isOnline())
+                {
+                    target.sendMessage(ChatColor.GRAY + "(" + sender.getName()
+                            + ": Opping " + target.getName() + ")");
+                }
+                return true;
+            }
+            else
+            {
+                sender.sendMessage("Unknown player: " + args[0]);
+            }
+        }
+        return false;
+    }
+    
+    public String expandName(String Name)
+    {
+        int m = 0;
+        String Result = "";
+        for (int n = 0; n < Bukkit.getServer().getOnlinePlayers().length; n++)
+        {
+            String str = Bukkit.getServer().getOnlinePlayers()[n].getName();
+            if (str.matches("(?i).*" + Name + ".*"))
+            {
+                m++;
+                Result = str;
+                if (m == 2)
+                {
+                    return null;
+                }
+            }
+            if (str.equalsIgnoreCase(Name))
+                return str;
+        }
+        if (m == 1)
+            return Result;
+        if (m > 1)
+        {
+            return null;
+        }
+        return Name;
+    }
+}
